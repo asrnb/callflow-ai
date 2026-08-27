@@ -60,7 +60,7 @@ function generateMockStructuredContent(input: CreateJobRequest): StructuredConte
     key_points: [
       trimToMax(`Lead with the practical outcome for ${input.audience}.`, 180),
       trimToMax(`Match the structure and pacing to ${platformLabel}.`, 180),
-      "Treat this mock output as a local development substitute for the Anthropic call."
+      "Preserve the async workflow while refining the final publishing details."
     ],
     cta: trimToMax(`Review this draft, add one proof point, and adapt it for ${platformLabel}.`, 260)
   });

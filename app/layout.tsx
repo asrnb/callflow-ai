@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     default: "ContentFlow AI",
     template: "%s | ContentFlow AI"
   },
-  description: "A production-oriented SaaS MVP for asynchronous AI content generation."
+  description: "A production-oriented SaaS for asynchronous AI content generation."
 };
 
 export default function RootLayout({

@@ -1,8 +1,8 @@
 # ContentFlow AI
 
-ContentFlow AI is a production-oriented MVP SaaS for authenticated users to queue AI content generation jobs and observe the full asynchronous lifecycle from request to result.
+ContentFlow AI is a production-oriented SaaS for authenticated users to queue AI content generation jobs and observe the full asynchronous lifecycle from request to result.
 
-The project is intentionally scoped as a polished portfolio application: it demonstrates full-stack TypeScript/Next.js engineering, Supabase PostgreSQL architecture, RLS security, background processing, structured LLM output validation, and meaningful automated tests without adding commercial-product complexity.
+The project is intentionally scoped as a polished portfolio application: it showcases full-stack TypeScript/Next.js engineering, Supabase PostgreSQL architecture, RLS security, background processing, structured LLM output validation, and meaningful automated tests without adding unnecessary product complexity.
 
 ## Stack
 
@@ -258,16 +258,16 @@ Required production environment variables:
 - `INNGEST_EVENT_KEY`
 - `INNGEST_SIGNING_KEY`
 
-Use `CONTENTFLOW_AI_PROVIDER=anthropic` for production. `CONTENTFLOW_AI_PROVIDER=mock` is for local portfolio demos when an Anthropic key is unavailable.
+Use `CONTENTFLOW_AI_PROVIDER=anthropic` for production. `CONTENTFLOW_AI_PROVIDER=mock` is for local development when an Anthropic key is unavailable.
 
 Never commit real credentials.
 
 ## Architectural Decisions
 
-- Inngest was chosen over synchronous route execution to demonstrate durable async processing on Vercel.
+- Inngest was chosen over synchronous route execution to showcase durable async processing on Vercel.
 - Supabase RLS is the primary cross-user read isolation layer, with server-owned writes and route-level ownership checks as defense in depth.
 - AI output is persisted only after Zod validation to keep the database contract stable.
-- A mock AI provider exists only to unblock local demos without changing the async job architecture.
+- A mock AI provider supports local development without changing the async job architecture.
 - Worker processing uses conditional database claims and a unique generated-content constraint to tolerate duplicate event delivery.
 - Execution events are stored separately from the job row so observability grows without bloating the primary job record.
-- The MVP keeps teams, billing, quotas, templates, and admin tooling out of scope to stay focused on the requested production architecture.
+- The product keeps teams, billing, quotas, templates, and admin tooling out of scope to stay focused on the requested production architecture.

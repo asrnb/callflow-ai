@@ -2,9 +2,9 @@
 
 ## Product Scope
 
-ContentFlow AI is a portfolio-grade SaaS MVP for authenticated users to submit AI content generation jobs and observe asynchronous execution from queue to result. The app demonstrates full-stack TypeScript/Next.js engineering, PostgreSQL design, Supabase Auth/RLS, structured Anthropic output, durable background processing with Inngest, and production-minded testing/deployment.
+ContentFlow AI is a portfolio-grade SaaS application for authenticated users to submit AI content generation jobs and observe asynchronous execution from queue to result. The app showcases full-stack TypeScript/Next.js engineering, PostgreSQL design, Supabase Auth/RLS, structured Anthropic output, durable background processing with Inngest, and production-minded testing/deployment.
 
-The MVP intentionally avoids billing, teams, usage quotas, admin dashboards, document collaboration, and complex workflow builders.
+The product intentionally avoids billing, teams, usage quotas, admin dashboards, document collaboration, and complex workflow builders.
 
 ## Architecture
 
