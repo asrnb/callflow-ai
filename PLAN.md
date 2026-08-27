@@ -15,6 +15,7 @@ The MVP intentionally avoids billing, teams, usage quotas, admin dashboards, doc
 - `/api/jobs` validates input, inserts a queued job, emits an Inngest event, and returns immediately with the job ID.
 - Inngest background function handles AI execution, retries, status transitions, and event persistence.
 - Anthropic Messages API is called only from the background function.
+- A local mock AI provider can replace only the Anthropic call while preserving the async worker, Supabase persistence, retries, and observability flow.
 - Zod validates request payloads and AI structured output before persistence.
 - Tailwind and shadcn/ui-style components power the dashboard UI.
 
@@ -96,7 +97,7 @@ The MVP intentionally avoids billing, teams, usage quotas, admin dashboards, doc
 
 ## Structured AI Output
 
-The worker requests an Anthropic tool call named `create_content_generation` with a JSON schema containing:
+In production mode, the worker requests an Anthropic tool call named `create_content_generation` with a JSON schema containing:
 
 - `hook`
 - `body`
@@ -105,6 +106,8 @@ The worker requests an Anthropic tool call named `create_content_generation` wit
 - `cta`
 
 The returned tool input is parsed through the shared Zod schema before inserting into `generated_contents`.
+
+In local `CONTENTFLOW_AI_PROVIDER=mock` mode, the worker returns deterministic structured content through the same Zod schema and persistence path without requiring `ANTHROPIC_API_KEY`.
 
 ## Retry Strategy
 

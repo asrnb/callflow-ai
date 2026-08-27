@@ -29,7 +29,7 @@ Users submit jobs with:
 - tone
 - platform
 
-`POST /api/jobs` performs only request validation, authentication, database persistence, event creation, and queue dispatch. It does not call Anthropic.
+`POST /api/jobs` performs only request validation, authentication, database persistence, event creation, and queue dispatch. It does not call Anthropic or any other AI provider.
 
 The route returns `202 Accepted` with the job ID immediately after enqueueing:
 
@@ -54,7 +54,7 @@ Inngest
   content.generate.requested
     loads job with service-role Supabase client
     conditionally claims queued/retrying jobs
-    calls Anthropic
+    calls the configured AI provider
     validates structured tool output with Zod
     persists generated_contents
     writes execution events
@@ -121,13 +121,13 @@ Important boundaries:
 
 ## Structured AI Output
 
-Anthropic is called from the Inngest worker in:
+AI generation is called from the Inngest worker in:
 
 ```txt
 src/lib/anthropic/content-generator.ts
 ```
 
-The worker requests a tool call named `create_content_generation` with JSON schema fields:
+In `CONTENTFLOW_AI_PROVIDER=anthropic` mode, the worker requests an Anthropic tool call named `create_content_generation` with JSON schema fields:
 
 - `hook`
 - `body`
@@ -136,6 +136,15 @@ The worker requests a tool call named `create_content_generation` with JSON sche
 - `cta`
 
 The tool input is validated with `generatedContentSchema` before persistence. Invalid model output is treated as a processing error and enters the retry path.
+
+For local development without an Anthropic key, set:
+
+```env
+CONTENTFLOW_AI_PROVIDER=mock
+ANTHROPIC_API_KEY=
+```
+
+This keeps Supabase, Auth, PostgreSQL, Inngest, status transitions, retries, persistence, and observability real while replacing only the LLM response with deterministic Zod-valid structured content.
 
 ## Retry Strategy
 
@@ -181,6 +190,8 @@ Open:
 http://localhost:3000
 ```
 
+If you do not have an Anthropic key yet, keep `CONTENTFLOW_AI_PROVIDER=mock` in `.env.local`. You can still connect real Supabase and run real background jobs; only the provider response is mocked.
+
 ## Inngest
 
 The Inngest handler is exposed at:
@@ -195,7 +206,11 @@ The job function is:
 src/lib/inngest/functions/generate-content.ts
 ```
 
-In local development, run the Inngest dev server against the app URL if you want to execute real background jobs locally.
+In local development, run the Inngest dev server against the app URL if you want to execute background jobs locally:
+
+```bash
+npx inngest-cli@latest dev -u http://localhost:3000/api/inngest
+```
 
 ## Testing
 
@@ -237,10 +252,13 @@ Required production environment variables:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `CONTENTFLOW_AI_PROVIDER`
 - `ANTHROPIC_API_KEY`
 - `ANTHROPIC_MODEL`
 - `INNGEST_EVENT_KEY`
 - `INNGEST_SIGNING_KEY`
+
+Use `CONTENTFLOW_AI_PROVIDER=anthropic` for production. `CONTENTFLOW_AI_PROVIDER=mock` is for local portfolio demos when an Anthropic key is unavailable.
 
 Never commit real credentials.
 
@@ -249,6 +267,7 @@ Never commit real credentials.
 - Inngest was chosen over synchronous route execution to demonstrate durable async processing on Vercel.
 - Supabase RLS is the primary cross-user read isolation layer, with server-owned writes and route-level ownership checks as defense in depth.
 - AI output is persisted only after Zod validation to keep the database contract stable.
+- A mock AI provider exists only to unblock local demos without changing the async job architecture.
 - Worker processing uses conditional database claims and a unique generated-content constraint to tolerate duplicate event delivery.
 - Execution events are stored separately from the job row so observability grows without bloating the primary job record.
 - The MVP keeps teams, billing, quotas, templates, and admin tooling out of scope to stay focused on the requested production architecture.

@@ -65,7 +65,7 @@ export const generateContentJob = inngest.createFunction(
 
     let currentJob = initialJob;
     const maxAttempts = currentJob.max_attempts;
-    const model = getServerEnv().anthropicModel;
+    const model = getServerEnv().generationModel;
 
     for (
       let attempt = currentJob.attempts + 1;
